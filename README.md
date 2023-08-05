@@ -2,6 +2,8 @@
 
 ## Click to Open - https://booksphere-assignment-kaushal.netlify.app/
 
+![App Screenshot](https://github.com/Kaushal12Shinde/BookSphere_Assignment/blob/master/Screenshot%202023-08-05%20162251.png)
+
 ## BookSphere is a single-page React application that allows users to search, filter, sort, and store book data extracted from an external API.
 
 ##Key Features
