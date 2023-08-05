@@ -9,7 +9,7 @@ const Card = ({ book }) => {
           <h3 className="title">{book.title}</h3>
           
           <button class="Btn">
-            <div class="sign">+</div>
+            <div class="sign">&#9998;</div>
           </button>
         
         </div>

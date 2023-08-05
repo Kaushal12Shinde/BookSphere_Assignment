@@ -187,7 +187,7 @@ const Booklist = () => {
       {!display && (
         <div className="content">
           {booksList && booksList.map((book) => 
-                <Card 
+                book.title && <Card 
                   book={book} 
                   key={book.id} 
                 />
