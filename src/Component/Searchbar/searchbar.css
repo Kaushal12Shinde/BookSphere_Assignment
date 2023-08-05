@@ -1,0 +1,10 @@
+.Searchbar input{
+    width: 100%;
+    padding: 10px 20px;
+    border: 1px solid black;
+    font-size: 22px;
+    font-weight: 400;
+    font-family: var(--fam);
+    border: none;
+    outline: none;
+}
