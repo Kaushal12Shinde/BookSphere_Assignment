@@ -27,6 +27,7 @@ const Booklist = () => {
     year: "",
     id:"",
   });
+  const Api = process.env.REACT_APP_BOOKLIST_API;
 
 // <---- Pop up ----->
   
@@ -160,11 +161,11 @@ const Booklist = () => {
 
     const getBook = async () => {
       try {
-        let {data:{ data }} = await axios(`http://68.178.162.203:8080/application-test-v1.1/books`);
+        let {data:{ data }} = await axios(Api);
         return data;
       } 
       catch (error) {
-        alert("Data Not Found");
+        notify("Data Not Found");
       }
     };
 
