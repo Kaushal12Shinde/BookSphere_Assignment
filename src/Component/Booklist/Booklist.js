@@ -12,11 +12,12 @@ const Booklist = () => {
   const [booksData, setBooksData] = useState([]);
   const [searchedText, setSearchedText] = useState("");
   const [booksList, setBooksList] = useState([]);
-  const [language, setLanguage] = useState("");
+  const [languageType, setLanguageType] = useState("");
+  const [languages,setLanguages] = useState([]);
   const [sortType, setSortType] = useState("");
   const [display, setDisplay] = useState(false);
-  const [isActive, setIsActive] = useState(false);
-  const [isUpdate, setIsUpdate] = useState(false);
+  const [page, setPage] = useState(1);
+  const [totalPage,setTotalPage] = useState();
   const [bookDetails, setBookDetails] = useState({
     author: "",
     country: "",
@@ -25,7 +26,6 @@ const Booklist = () => {
     pages: "",
     title: "",
     year: "",
-    id:"",
   });
   const Api = process.env.REACT_APP_BOOKLIST_API;
 
@@ -48,56 +48,10 @@ const Booklist = () => {
       setDisplay(true);
     };
 
-// <----- Adding in watchList ----->
-
-    const handleAddWatchList = (book) => { 
-      
-      let savedBooks = JSON.parse(localStorage.getItem('savedBooks'));
-      if (savedBooks) {
-        
-        if (!savedBooks.some(existingBook => existingBook.id === book.id)) {
-          savedBooks.push(book);
-          localStorage.setItem("books", JSON.stringify(savedBooks));
-          notify('Book added to list!');
-        }
-        else
-          notify(`Already Added!`);
-      
-      } 
-      else {
-       
-        savedBooks = [];
-        savedBooks.push(book);
-        notify('Book added to list!');
-      
-      }
-      localStorage.setItem('savedBooks', JSON.stringify(savedBooks));
-    }
-
-
-// <----- Deleting from watchList ----->
-  
-    const handleDelete = (book) => {
-      
-      const books = JSON.parse(localStorage.getItem('savedBooks'));
-      const updatedBooks = books.filter(existingBook => existingBook.id !== book.id);
-      localStorage.setItem('savedBooks', JSON.stringify(updatedBooks));
-      setIsUpdate(!isUpdate);
-    
-    }
-
-
-// <----- Active WatchLIst ----->`
-
-    const handleActiveWatchList = () =>{
-      setIsActive(!isActive);
-    }
-
-
 // <----- filter with Language ----->
 
     const handleLanguageChange = (e) => {
-      setLanguage(e.target.value);
+      setLanguageType(e.target.value);
     };
 
 
@@ -113,28 +67,17 @@ const Booklist = () => {
     useEffect(() => {
       
       if (booksData) {
-        let filteredBooks = isActive ? JSON.parse(localStorage.getItem('savedBooks')) : booksData;
-
-        // Apply text search filter
-          if (searchedText.length > 0) {
-            let text = searchedText.toLowerCase();
-            filteredBooks = filteredBooks.filter((book) => {
-            
-              let title = book.title.toLowerCase();
-              return title.includes(text);
-            
-            });
-          }
+        let filteredBooks = booksData;
 
         // Apply language filter
-          if (language) {
-            filteredBooks = filteredBooks.filter((book) => book.language === language);
+          if (languageType) {
+            filteredBooks = filteredBooks.filter((book) => book.language === languageType);
           }
 
         setBooksList(filteredBooks);
       }
 
-    }, [searchedText, language, booksData, isActive , isUpdate]);
+    }, [ languageType, booksData ]);
 
 
 // <----- Sorting w.r.t Pages ------>  
@@ -157,25 +100,50 @@ const Booklist = () => {
     }, [sortType]);
 
 
+    const handlePrevPage = () => {
+      if(page>1)
+        setPage(page-1);
+    }
+
+    const handleNextPage = () => {
+      if(totalPage && page<totalPage)
+        setPage(page+1);
+    }
+
 // <-------- Api Call -------->
 
+    
     const getBook = async () => {
-      try {
-        let {data:{ data }} = await axios(Api);
-        return data;
-      } 
-      catch (error) {
-        notify("Data Not Found");
-      }
+
+        let url = `http://68.178.162.203:8080/application-test-v1.1/books?page=${page}`;
+          if (searchedText !== "") {
+            url += `&title=${searchedText}`;
+          }
+          return await axios.get(url)
+          .then((response) =>{
+            setTotalPage(response.data.pagination.totalPages);
+            console.log(response)
+            return response.data
+          })
+          .catch((error) => notify(error))
+
     };
+      
 
-    useEffect(() => {
-      getBook().then((data) => {
-          console.log(data)
-        setBooksData(data);
-      });
-    }, []);
+      useEffect(() => {
+        getBook().then((data) => {
+          let books = data.data
+          let setLang = new Set();
+          books.map((book)=>{
+            if(book.language)
+              setLang.add(book.language);
+          })
+          setLanguages([...setLang]);
+          setBooksData(books);
+        });
+      }, [searchedText,page])
 
+      
     
 // <---------------------->
 
@@ -200,7 +168,7 @@ const Booklist = () => {
               Select Languages
             </option>
             <option value="">All</option>
-            <option value="English">English</option>
+            {languages && languages.map((lang)=> <option value={lang}>{lang}</option>)}
           </select>
           
           <select onChange={handleSortType}>
@@ -212,25 +180,25 @@ const Booklist = () => {
           </select>
           
           <button onClick={handleAddForm}>Add Book</button>
-          <button onClick={handleActiveWatchList} style={{backgroundColor: isActive ? '#CCCCFF' : 'white'}}>My Book List</button>
-          {isActive && <button onClick={()=>{localStorage.clear(); setIsUpdate(!isUpdate);}}>Clear All</button>}
-        
+          
         </div>
       )}
 
       {!display && (
         <div className="content">
-          {booksList ?
-            booksList.map((book) => 
+          {booksList && booksList.map((book) => 
                 <Card 
                   book={book} 
                   key={book.id} 
-                  handleAddWatchList={handleAddWatchList} 
-                  isActive={isActive} 
-                  handleDelete={handleDelete}
                 />
-            ) :
-            <h3 className="loading">No Books added Yet</h3>
+              )
+          }
+          {booksList &&
+            <div className="pagination">
+              <button onClick={handlePrevPage}>&#8592;</button>
+              <p className="page">{page}</p>
+              <button onClick={handleNextPage}>&#8594;</button>
+            </div>
           }
         </div>
       )}
@@ -240,7 +208,7 @@ const Booklist = () => {
           bookDetails={bookDetails}
           setBookDetails={setBookDetails}
           setDisplay={setDisplay}
-          handleAddWatchList={handleAddWatchList}
+          notify={notify}
         />
       )}
     </div>
@@ -248,3 +216,4 @@ const Booklist = () => {
 };
 
 export default Booklist;
+// http://68.178.162.203:8080/application-test-v1.1/books?page=3&pageSize=25
