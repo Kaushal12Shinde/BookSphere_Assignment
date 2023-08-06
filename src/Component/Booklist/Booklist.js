@@ -164,7 +164,6 @@ const Booklist = () => {
       
       {!display && (
         <Searchbar
-          searchedText={searchedText}
           setSearchedText={setSearchedText}
         />
       )}
