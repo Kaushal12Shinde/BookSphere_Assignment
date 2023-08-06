@@ -3,6 +3,8 @@ import './bookForm.css'
 
 const BookForm = ({ bookDetails , setBookDetails , setDisplay , notify, editId, setEditId}) => {
     
+    const Api = process.env.REACT_APP_BOOKLIST_API;
+
     // <----- From Details ----->
 
     const handleChange = (e) => {
@@ -21,7 +23,7 @@ const BookForm = ({ bookDetails , setBookDetails , setDisplay , notify, editId, 
         if(editId){
             console.log(bookDetails);
             let id = editId;
-            await axios.put(`http://68.178.162.203:8080/application-test-v1.1/books/${id}`, bookDetails)
+            await axios.put(`${Api}/${id}`, bookDetails)
             .then((reponse)=>{
                 notify('Book added successfully!')
                 console.log(reponse);
@@ -35,7 +37,7 @@ const BookForm = ({ bookDetails , setBookDetails , setDisplay , notify, editId, 
         else
         {
             console.log(bookDetails);
-            await axios.post("http://68.178.162.203:8080/application-test-v1.1/books", bookDetails)
+            await axios.post(`${Api}`, bookDetails)
             .then((reponse)=>{
                 notify('Book added successfully!')
                 console.log(reponse);

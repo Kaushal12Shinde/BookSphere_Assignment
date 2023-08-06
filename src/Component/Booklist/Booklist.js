@@ -35,14 +35,12 @@ const Booklist = () => {
     const [page, setPage] = useState(1);
     const [totalPage,setTotalPage] = useState();
 
-//<----- For Post, Put ----->
+//<----- For Post, Put, Api ----->
 
     const [display, setDisplay] = useState(false);
     const [editId, setEditId] = useState();
-  
-  
-  
-  
+    const Api = process.env.REACT_APP_BOOKLIST_API;
+
 // <---- Pop up ----->
   
 
@@ -122,7 +120,7 @@ const Booklist = () => {
     
     const getBook = async () => {
 
-        let url = `http://68.178.162.203:8080/application-test-v1.1/books?page=${page}`;
+        let url = `${Api}?page=${page}`;
           if (searchedText !== "") {
             url += `&title=${searchedText}`;
           }
@@ -154,7 +152,7 @@ const Booklist = () => {
 
       
     
-// <---------------------->
+// <-----------**---------->
 
 
   return (
