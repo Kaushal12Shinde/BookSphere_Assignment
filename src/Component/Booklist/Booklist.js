@@ -137,20 +137,20 @@ const Booklist = () => {
     };
       
 
-      // useEffect(() => {
-      //   if(!display){
-      //   getBook().then((data) => {
-      //     let books = data.data
-      //     let setLang = new Set();
-      //     books.forEach((book)=>{
-      //       if(book.language)
-      //         setLang.add(book.language);
-      //     })
-      //     setLanguages([...setLang]);
-      //     setBooksData(books);
-      //   });
-      // }
-      // }, [searchedText,page,display])
+      useEffect(() => {
+        if(!display){
+        getBook().then((data) => {
+          let books = data.data
+          let setLang = new Set();
+          books.forEach((book)=>{
+            if(book.language)
+              setLang.add(book.language);
+          })
+          setLanguages([...setLang]);
+          setBooksData(books);
+        });
+      }
+      }, [searchedText,page,display])
 
       
     
