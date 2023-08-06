@@ -1,14 +1,14 @@
 import React from 'react'
 import './Card.css'
 
-const Card = ({ book }) => {
+const Card = ({ book ,handleEdit }) => {
   return (
     <div className='Card'>
         <div className="detail">
           
           <h3 className="title">{book.title}</h3>
           
-          <button class="Btn">
+          <button class="Btn" onClick={()=>{handleEdit(book)}}>
             <div class="sign">&#9998;</div>
           </button>
         

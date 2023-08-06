@@ -9,28 +9,43 @@ import BookForm from "../BookForm/BookForm";
 
 const Booklist = () => {
 
-  const [booksData, setBooksData] = useState([]);
-  const [searchedText, setSearchedText] = useState("");
-  const [booksList, setBooksList] = useState([]);
-  const [languageType, setLanguageType] = useState("");
-  const [languages,setLanguages] = useState([]);
-  const [sortType, setSortType] = useState("");
-  const [display, setDisplay] = useState(false);
-  const [page, setPage] = useState(1);
-  const [totalPage,setTotalPage] = useState();
-  const [bookDetails, setBookDetails] = useState({
-    author: "",
-    country: "",
-    language: "",
-    link: "",
-    pages: "",
-    title: "",
-    year: "",
-  });
-  const Api = process.env.REACT_APP_BOOKLIST_API;
+// <----- For Storing ----->
 
+    const [booksData, setBooksData] = useState([]);
+    const [booksList, setBooksList] = useState([]);
+    const [languages,setLanguages] = useState([]);
+    const [bookDetails, setBookDetails] = useState({
+      author: "",
+      country: "",
+      language: "",
+      link: "",
+      pages: "",
+      title: "",
+      year: "",
+    });
+
+// <----- For Searching and Filters ----->
+
+    const [searchedText, setSearchedText] = useState("");
+    const [sortType, setSortType] = useState("");
+    const [languageType, setLanguageType] = useState("");
+  
+// <----- For Pagination ----->
+
+    const [page, setPage] = useState(1);
+    const [totalPage,setTotalPage] = useState();
+
+//<----- For Post, Put ----->
+
+    const [display, setDisplay] = useState(false);
+    const [editId, setEditId] = useState();
+  
+  
+  
+  
 // <---- Pop up ----->
   
+
   const notify = (message) => toast(`${message}`, {
     position: "top-center",
     autoClose: 1500,
@@ -42,45 +57,37 @@ const Booklist = () => {
     theme: "dark",
   });
   
-// <----- Add Form ----->
 
-    const handleAddForm = () => {
-      setDisplay(true);
-    };
-
-// <----- filter with Language ----->
-
-    const handleLanguageChange = (e) => {
-      setLanguageType(e.target.value);
-    };
-
-
-// <----- filter by SortingType ------>
-
-    const handleSortType = (e) => {
-      setSortType(e.target.value);
-    };
+// <---- Editing Existing Book ----->
+    
+    const handleEdit= (book)=>{
+        setEditId(book.id);
+        const { id, ...otherProperties } = book;
+          setBookDetails({
+              ...bookDetails,
+              ...otherProperties
+        });
+        setDisplay(true);
+    }
 
 
 // <------ filter And Search ----->
 
+
     useEffect(() => {
-      
       if (booksData) {
         let filteredBooks = booksData;
-
         // Apply language filter
           if (languageType) {
             filteredBooks = filteredBooks.filter((book) => book.language === languageType);
           }
-
         setBooksList(filteredBooks);
       }
-
     }, [ languageType, booksData ]);
 
 
 // <----- Sorting w.r.t Pages ------>  
+
 
     useEffect(() => {
       
@@ -93,12 +100,11 @@ const Booklist = () => {
         else {
           filteredBooks.sort((a, b) => (parseInt(b.pages) || 0) - (parseInt(a.pages) || 0));
         }
-        
+
         setBooksList(filteredBooks);
       }
     
     }, [sortType]);
-
 
     const handlePrevPage = () => {
       if(page>1)
@@ -109,6 +115,7 @@ const Booklist = () => {
       if(totalPage && page<totalPage)
         setPage(page+1);
     }
+
 
 // <-------- Api Call -------->
 
@@ -130,18 +137,20 @@ const Booklist = () => {
     };
       
 
-      useEffect(() => {
-        getBook().then((data) => {
-          let books = data.data
-          let setLang = new Set();
-          books.map((book)=>{
-            if(book.language)
-              setLang.add(book.language);
-          })
-          setLanguages([...setLang]);
-          setBooksData(books);
-        });
-      }, [searchedText,page])
+      // useEffect(() => {
+      //   if(!display){
+      //   getBook().then((data) => {
+      //     let books = data.data
+      //     let setLang = new Set();
+      //     books.forEach((book)=>{
+      //       if(book.language)
+      //         setLang.add(book.language);
+      //     })
+      //     setLanguages([...setLang]);
+      //     setBooksData(books);
+      //   });
+      // }
+      // }, [searchedText,page,display])
 
       
     
@@ -162,8 +171,8 @@ const Booklist = () => {
 
       {!display && (
         <div className="feature">
-          
-          <select onChange={handleLanguageChange}>
+
+          <select onChange={(e)=>{setLanguageType(e.target.value)}}>
             <option selected disabled hidden>
               Select Languages
             </option>
@@ -171,7 +180,7 @@ const Booklist = () => {
             {languages && languages.map((lang)=> <option value={lang}>{lang}</option>)}
           </select>
           
-          <select onChange={handleSortType}>
+          <select onChange={(e)=>{setSortType(e.target.value)}}>
             <option selected disabled hidden>
               Sort
             </option>
@@ -179,7 +188,7 @@ const Booklist = () => {
             <option value="desc">Descending</option>
           </select>
           
-          <button onClick={handleAddForm}>Add Book</button>
+          <button onClick={()=>{setDisplay(true)}}>Add Book</button>
           
         </div>
       )}
@@ -189,7 +198,8 @@ const Booklist = () => {
           {booksList && booksList.map((book) => 
                 book.title && <Card 
                   book={book} 
-                  key={book.id} 
+                  key={book.id}
+                  handleEdit={handleEdit} 
                 />
               )
           }
@@ -209,6 +219,8 @@ const Booklist = () => {
           setBookDetails={setBookDetails}
           setDisplay={setDisplay}
           notify={notify}
+          editId={editId}
+          setEditId={setEditId}
         />
       )}
     </div>
@@ -216,4 +228,3 @@ const Booklist = () => {
 };
 
 export default Booklist;
-// http://68.178.162.203:8080/application-test-v1.1/books?page=3&pageSize=25
