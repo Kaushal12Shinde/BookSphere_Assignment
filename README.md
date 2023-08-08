@@ -1,6 +1,6 @@
 ## Assignment-BookSphere - Your Personal Book Search and List Creation Application
 ## Live Demo
-   [Click Here - Assignment_BookSphere ->](https://booksphere-kaushal.netlify.app/)
+   [Click Here -> Assignment_BookSphere](https://booksphere-kaushal.netlify.app/)
    
 ![App Screenshot](https://github.com/Kaushal12Shinde/BookSphere_Assignment/blob/master/BookSphere_DeskTop_View.png)
 
